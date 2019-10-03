@@ -1,8 +1,12 @@
 language: python
 python:
   - "3.7"
+services:
+  - postgresql
 install:
   - pip install -r requirements.txt
-  - sudo apt-get update && sudo apt-get install flake8 python-psycopg2
+  - sudo apt-get update && sudo apt-get install flake8 python-psycopg2 
+before_script:
+  - psql -c 'create database database;' -U postgres
 script:
   - flake8 .
