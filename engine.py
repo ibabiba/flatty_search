@@ -65,7 +65,7 @@ def parser(url, count):
             # price by m2
             order_by_m2 = re.search(r'\d+\s+\d+\s+руб/кв.м', order_price)
             if not order_by_m2:
-              order_by_m2 = re.search(r'\d+\s+руб/кв.м', order_price)
+                order_by_m2 = re.search(r'\d+\s+руб/кв.м', order_price)
             if order_by_m2 is not None:
                 order_by_m2 = re.sub(r'\s+', '', re.sub(r'\s+руб/кв.м', '', order_by_m2.group(0)))
             else:
@@ -74,7 +74,7 @@ def parser(url, count):
 
             # who
             order_who = order.find('p', {'class': 'f12'})
-            if order_who != None:
+            if order_who is not None:
                 order_who = order_who.text
             else:
                 order_who = "None"
@@ -87,14 +87,14 @@ def parser(url, count):
                 order_numbers = ', '.join([str(x) for x in order_numbers])
                 order_number_name = re.search(r'\D+$', order_number)
                 if order_number_name is not None:
-                    order_number_name =  re.sub(r'\,\s+', '', order_number_name.group(0))
+                    order_number_name = re.sub(r'\,\s+', '', order_number_name.group(0))
                 else:
                     order_number_name = 'None'
             else:
                 order_number = 'None'
                 order_number_name = 'None'
-            print('Numbers: '+ order_numbers)
-            print('Numbers_name: '+ order_number_name)
+            print('Numbers: ' + order_numbers)
+            print('Numbers_name: ' + order_number_name)
 
             # code & update
             order_update = order.find('p', {'class': 'fl f11 grey'}).text
