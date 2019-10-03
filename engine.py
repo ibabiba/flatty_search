@@ -1,13 +1,13 @@
 # -*- encoding: utf-8 -*-
 
-import psycopg2
+import psycopg3
 import requests
 import re
 import bs4
 # import lxml
 import datetime
 
-conn = psycopg2.connect(dbname='postgres', user='postgres',
+conn = psycopg3.connect(dbname='postgres', user='postgres',
                         host='localhost')
 cursor = conn.cursor()
 

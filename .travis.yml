@@ -5,7 +5,7 @@ services:
   - postgresql
 install:
   - pip install -r requirements.txt
-  - sudo apt-get update && sudo apt-get install flake8 python-psycopg2 
+  - sudo apt-get update && sudo apt-get install flake8 python-psycopg3 
 before_script:
   - psql -c 'create database database;' -U postgres
 script:
