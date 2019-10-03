@@ -54,16 +54,12 @@ def parser(url, count):
             if not order_all:
                 order_all = re.search(r'\d+\s+руб,', order_price)
             if order_all is not None:
-                order_all = re.sub(
-                    r'\s+', '', re.sub(r'\s+руб,', '', order_all.group(0))
-                )
+                order_all = re.sub(r'\s+', '', re.sub(r'\s+руб,', '', order_all.group(0)))
             else:
                 order_all = 'None'
             order_mln = re.match(r'\S+\s+млн\sруб,', order_price)
             if order_mln is not None:
-                order_all = str(float(re.sub(
-                    r',', '.', re.sub(r'\s+млн\sруб,', '', order_mln.group(0)))
-                )*1000000)
+                order_all = str(float(re.sub(r',', '.', re.sub(r'\s+млн\sруб,', '', order_mln.group(0))))*1000000)
             print('Цена: ' + order_all)
 
             # price by m2
@@ -71,9 +67,7 @@ def parser(url, count):
             if not order_by_m2:
                 order_by_m2 = re.search(r'\d+\s+руб/кв.м', order_price)
             if order_by_m2 is not None:
-                order_by_m2 = re.sub(
-                    r'\s+', '', re.sub(r'\s+руб/кв.м', '', order_by_m2.group(0))
-                )
+                order_by_m2 = re.sub(r'\s+', '', re.sub(r'\s+руб/кв.м', '', order_by_m2.group(0)))
             else:
                 order_by_m2 = "None"
             print('Price by m2: ' + order_by_m2)
@@ -106,9 +100,7 @@ def parser(url, count):
             order_update = order.find('p', {'class': 'fl f11 grey'}).text
             order_update = re.sub(r'Обновлено: ', '', order_update)
             print(order_update)
-            order_update = datetime.datetime.strftime(
-                datetime.datetime.strptime(order_update, '%d.%m.%Y'), '%Y-%m-%d'
-            )
+            order_update = datetime.datetime.strftime(datetime.datetime.strptime(order_update, '%d.%m.%Y'), '%Y-%m-%d')
             print(order_update)
             order_code = order.find('p', {'class': 'fr f11 grey'}).text
             order_code = re.sub(r'Код: ', '', order_code)
@@ -125,14 +117,10 @@ def parser(url, count):
             print("")
 
             # current time
-            currentdatetime = datetime.datetime.strftime(
-                datetime.datetime.now(), '%Y-%m-%d %H:%M:%S'
-            )
+            currentdatetime = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
 
-            params = (order_name, order_link, small_where, str(order_who),
-                      order_all, order_by_m2, order_numbers, order_number_name,
-                      currentdatetime, order_update, order_code
-                      )
+            params = (order_name, order_link, small_where, str(order_who), order_all, order_by_m2, order_numbers,
+                      order_number_name, currentdatetime, order_update, order_code)
 
             cursor.execute("INSERT IGNORE INTO realtby(order_name, order_link, small_where, order_who, order_price, \
              order_by_m2, order_numbers, order_number_name, currentdatetime, order_update, order_code) VALUES(%s, %s, \
