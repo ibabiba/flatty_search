@@ -2,7 +2,7 @@ import psycopg2
 import requests
 import re
 import bs4
-import lxml
+# import lxml
 import datetime
 
 conn = psycopg2.connect(dbname='database', user='postgres',
@@ -52,9 +52,9 @@ def parser(url, count):
             order_price = order.find('span', {'class': 'price-byr'}).text
             order_all = re.match(r'\d+\s+\d+\s+руб,', order_price)
             if not order_all:
-              order_all = re.search(r'\d+\s+руб,', order_price)
+                order_all = re.search(r'\d+\s+руб,', order_price)
             if order_all != None:
-                order_all = re.sub(r'\s+', '', re.sub(r'\s+руб,', '',order_all.group(0)))
+                order_all = re.sub(r'\s+', '', re.sub(r'\s+руб,', '', order_all.group(0)))
             else:
                 order_all = 'None'
             order_mln = re.match(r'\S+\s+млн\sруб,', order_price)
@@ -62,12 +62,12 @@ def parser(url, count):
                 order_all = str(float(re.sub(r',', '.', re.sub(r'\s+млн\sруб,', '', order_mln.group(0))))*1000000)
             print('Цена: ' + order_all)
 
-            #price by m2
+            # price by m2
             order_by_m2 = re.search(r'\d+\s+\d+\s+руб/кв.м', order_price)
             if not order_by_m2:
               order_by_m2 = re.search(r'\d+\s+руб/кв.м', order_price)
             if order_by_m2 != None:
-                order_by_m2 = re.sub(r'\s+', '', re.sub(r'\s+руб/кв.м', '',order_by_m2.group(0)))
+                order_by_m2 = re.sub(r'\s+', '', re.sub(r'\s+руб/кв.м', '', order_by_m2.group(0)))
             else:
                 order_by_m2 = "None"
             print('Price by m2: ' + order_by_m2)
