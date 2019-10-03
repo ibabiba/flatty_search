@@ -53,12 +53,12 @@ def parser(url, count):
             order_all = re.match(r'\d+\s+\d+\s+руб,', order_price)
             if not order_all:
                 order_all = re.search(r'\d+\s+руб,', order_price)
-            if order_all != None:
+            if order_all is not None:
                 order_all = re.sub(r'\s+', '', re.sub(r'\s+руб,', '', order_all.group(0)))
             else:
                 order_all = 'None'
             order_mln = re.match(r'\S+\s+млн\sруб,', order_price)
-            if order_mln != None:
+            if order_mln is not None:
                 order_all = str(float(re.sub(r',', '.', re.sub(r'\s+млн\sруб,', '', order_mln.group(0))))*1000000)
             print('Цена: ' + order_all)
 
@@ -66,7 +66,7 @@ def parser(url, count):
             order_by_m2 = re.search(r'\d+\s+\d+\s+руб/кв.м', order_price)
             if not order_by_m2:
               order_by_m2 = re.search(r'\d+\s+руб/кв.м', order_price)
-            if order_by_m2 != None:
+            if order_by_m2 is not None:
                 order_by_m2 = re.sub(r'\s+', '', re.sub(r'\s+руб/кв.м', '', order_by_m2.group(0)))
             else:
                 order_by_m2 = "None"
@@ -82,11 +82,11 @@ def parser(url, count):
 
             # number
             order_number = order.find('p', {'class': 'mb0'}).get_text()
-            if order_number != None:
+            if order_number is not None:
                 order_numbers = re.findall(r'\+\d+\s\d+\s\d+\-\d+\-\d+', order_number)
                 order_numbers = ', '.join([str(x) for x in order_numbers])
                 order_number_name = re.search(r'\D+$', order_number)
-                if order_number_name != None:
+                if order_number_name is not None:
                     order_number_name =  re.sub(r'\,\s+', '', order_number_name.group(0))
                 else:
                     order_number_name = 'None'
@@ -111,8 +111,8 @@ def parser(url, count):
             small_where = order_about.find('p').text
             print(small_where)
 
-           # small_about = order_about.find_all("p")[-1].get_text()
-           # print(small_about)
+            # small_about = order_about.find_all("p")[-1].get_text()
+            # print(small_about)
 
             print("")
 
@@ -126,6 +126,6 @@ def parser(url, count):
              order_by_m2, order_numbers, order_number_name, currentdatetime, order_update, order_code) VALUES(%s, %s, \
              %s, %s, %s, %s, %s, %s, %s, %s, %s);", (params))
 
-          #  conn.commit()
+            # conn.commit()
 
 parser(url, count)
