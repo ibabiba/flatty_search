@@ -13,6 +13,7 @@ count = 0
 pagetempcount = 0
 url = 'https://realt.by/sale/flats/?page='
 
+
 def page_count(url, count):
     url = url + str(count)
     s = requests.get(url)
@@ -25,12 +26,13 @@ def page_count(url, count):
 
 count = page_count(url, count)
 
+
 def parser(url, count):
     for x in range(0, int(count)):
         print(x)
         print(url + str(x))
 
-        results = []
+        # results = []
 
         s = requests.get(url + str(x))
         b = bs4.BeautifulSoup(s.text, "lxml")
