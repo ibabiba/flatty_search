@@ -59,7 +59,7 @@ def parser(url, count):
                 order_all = 'None'
             order_mln = re.match(r'\S+\s+млн\sруб,', order_price)
             if order_mln is not None:
-                order_all = str(float(re.sub(r',', '.', re.sub(r'\s+млн\sруб,', '', order_mln.group(0))))*1000000)
+                order_all = str(float(re.sub(r',', '.', re.sub(r'\s+млн\sруб,', '', order_mln.group(0)))) * 1000000)
             print('Цена: ' + order_all)
 
             # price by m2
