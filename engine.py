@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 import psycopg2
 import requests
 import re
@@ -42,11 +44,11 @@ def parser(url, count):
             # name
             item = order.find('div', {'class': 'title'})
             order_name = item.find('a').text
-            print('Название: ' + order_name)
+            print('Name: ' + order_name)
 
             # link
             order_link = item.find('a').get('href')
-            print('Ссылка: ' + order_link)
+            print('Link: ' + order_link)
 
             # price
             order_price = order.find('span', {'class': 'price-byr'}).text
