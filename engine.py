@@ -7,7 +7,7 @@ import bs4
 # import lxml
 import datetime
 
-conn = psycopg2.connect(dbname='database', user='postgres',
+conn = psycopg2.connect(dbname='postgres', user='postgres',
                         host='localhost')
 cursor = conn.cursor()
 
