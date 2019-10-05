@@ -10,4 +10,4 @@ before_script:
   - psql -c 'create database database;' -U postgres
 script:
   - flake8 .
-  - python engine.py
+    #  - python engine.py
