@@ -8,11 +8,6 @@ install:
   - sudo apt-get update && sudo apt-get install flake8 python-psycopg2 
 before_script:
   - psql -c 'create database database;' -U postgres
-  - echo $TRAVIS_BRANCH
-  - echo $TRAVIS_PULL_REQUEST
-  - echo $TRAVIS_BUILD_ID
-  - echo $TRAVIS_BUILD_WEB_URL
-  - echo $TRAVIS_JOB_WEB_URL
 script:
   - flake8 .
     #  - python engine.py
