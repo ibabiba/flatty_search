@@ -4,11 +4,13 @@ import psycopg2
 import requests
 import re
 import bs4
-# import lxml
+import lxml
 import datetime
 
-conn = psycopg2.connect(dbname='postgres', user='postgres',
-                        host='localhost')
+conn = psycopg2.connect(dbname='d9gqs0c8qluemb', user='rfyglxtwtqlzun',
+                        host='ec2-174-129-231-116.compute-1.amazonaws.com',
+                        password='38ae72b269ce6d2ed66524d4ece1fb3ba412f380c22128f27a7f3ee780465524')
+
 cursor = conn.cursor()
 
 count = 0
@@ -38,7 +40,7 @@ def parser(url, count):
 
         s = requests.get(url + str(x))
         b = bs4.BeautifulSoup(s.text, "lxml")
-        order_list = b.findAll('div', {'class': 'bd-item '})
+        order_list = b.findAll('div', {'class': 'bd-item'})
 
         for order in order_list:
             # name
@@ -95,6 +97,12 @@ def parser(url, count):
             else:
                 order_number = 'None'
                 order_number_name = 'None'
+
+
+            # format nubers
+            if order_numbers is not None:
+                order_numbers = re.sub(r'\s', '', re.sub(r'-', '', order_numbers))
+
             print('Numbers: ' + order_numbers)
             print('Numbers_name: ' + order_number_name)
 
@@ -121,13 +129,19 @@ def parser(url, count):
             # current time
             currentdatetime = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
 
-            params = (order_name, order_link, small_where, str(order_who), order_all, order_by_m2, order_numbers,
-                      order_number_name, currentdatetime, order_update, order_code)
+            # params = (order_name, order_link, small_where, str(order_who), order_all, order_by_m2, order_numbers,
+            #          order_number_name, currentdatetime, order_update, order_code)
 
-            cursor.execute("INSERT IGNORE INTO realtby(order_name, order_link, small_where, order_who, order_price, \
-             order_by_m2, order_numbers, order_number_name, currentdatetime, order_update, order_code) VALUES(%s, %s, \
-             %s, %s, %s, %s, %s, %s, %s, %s, %s);", (params))
+            # cursor.execute("INSERT INTO realtby(order_name, order_link, small_where, order_who, order_price, \
+            # order_by_m2, order_numbers, order_number_name, currentdatetime, order_update, order_code) VALUES(%s, %s, \
+            # %s, %s, %s, %s, %s, %s, %s, %s, %s);", (params))
 
-            # conn.commit()
+            params = (order_numbers, str(order_who), order_number_name)
+
+            cursor.execute("INSERT INTO public.\"Agents\"(order_number, order_who, order_number_name) VALUES(%s, %s, "
+                           "%s) EXCEPT SELECT * from public.\"Agents\";", (params))
+            conn.commit()
+
+
 
 parser(url, count)
