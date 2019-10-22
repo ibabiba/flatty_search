@@ -7,9 +7,12 @@ import bs4
 import lxml
 import datetime
 
-conn = psycopg2.connect(dbname='d9gqs0c8qluemb', user='rfyglxtwtqlzun',
-                        host='ec2-174-129-231-116.compute-1.amazonaws.com',
-                        password='38ae72b269ce6d2ed66524d4ece1fb3ba412f380c22128f27a7f3ee780465524')
+#conn = psycopg2.connect(dbname='d9gqs0c8qluemb', user='rfyglxtwtqlzun',
+#                        host='ec2-174-129-231-116.compute-1.amazonaws.com',
+#                        password='38ae72b269ce6d2ed66524d4ece1fb3ba412f380c22128f27a7f3ee780465524')
+
+conn = psycopg2.connect(dbname='database', user='postgres',
+                        host='localhost')
 
 cursor = conn.cursor()
 
@@ -84,6 +87,7 @@ def parser(url, count):
                 order_who = "None"
             print("Who: " + order_who)
 
+
             # number
             order_number = order.find('p', {'class': 'mb0'}).get_text()
             if order_number is not None:
@@ -95,16 +99,16 @@ def parser(url, count):
                 else:
                     order_number_name = 'None'
             else:
-                order_number = 'None'
+                order_numbers = 'None'
                 order_number_name = 'None'
-
 
             # format nubers
             if order_numbers is not None:
-                order_numbers = re.sub(r'\s', '', re.sub(r'-', '', order_numbers))
+                order_numbers = re.sub(r'\s|-', '', order_numbers)
 
             print('Numbers: ' + order_numbers)
             print('Numbers_name: ' + order_number_name)
+
 
             # code & update
             order_update = order.find('p', {'class': 'fl f11 grey'}).text
@@ -138,10 +142,31 @@ def parser(url, count):
 
             params = (order_numbers, str(order_who), order_number_name)
 
-            cursor.execute("INSERT INTO public.\"Agents\"(order_number, order_who, order_number_name) VALUES(%s, %s, "
-                           "%s) EXCEPT SELECT * from public.\"Agents\";", (params))
+            if order_who:
+                cursor.execute("INSERT INTO public.\"Agents\"(order_number, order_who, order_number_name) VALUES(%s, "
+                               "%s, %s) EXCEPT SELECT order_number, order_who from public.\"Agents\";", (params))
+            else:
+                cursor.execute("INSERT INTO public.\"Agents\"(order_number, order_who, order_number_name) VALUES(%s, "
+                               "%s, %s) EXCEPT SELECT * from public.\"Agents\";", (params))
             conn.commit()
 
-
-
 parser(url, count)
+
+def vacuum():
+    #cursor.execute("SELECT order_number, order_who FROM public.\"Agents\" WHERE order_who IS DISTINCT FROM 'None'"
+    #               "ORDER BY order_who ASC;")
+    cursor.execute("SELECT order_number, order_who, COUNT(*) FROM public.\"Agents\" WHERE order_who "
+                   "IS DISTINCT FROM 'None' GROUP BY order_number, order_who HAVING COUNT(*) > 1 ORDER BY order_who ASC;")
+    mobile_records = cursor.fetchall()
+    for row in mobile_records:
+        print(row)
+        cursor.execute("DELETE FROM public.\"Agents\" WHERE order_who = %s;", (row[1],))
+    conn.commit()
+    cursor.execute("SELECT order_number, order_who, COUNT(*) FROM public.\"Agents\" WHERE order_who "
+                   "IS DISTINCT FROM 'None' GROUP BY order_number, order_who HAVING COUNT(*) > 1 ORDER BY order_who ASC;")
+    mobile_records = cursor.fetchall()
+    for row in mobile_records:
+        print(row)
+
+
+#vacuum()
