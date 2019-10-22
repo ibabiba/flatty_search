@@ -5,7 +5,6 @@ import requests
 import re
 import bs4
 import lxml
-import datetime
 
 conn = psycopg2.connect(dbname='d9gqs0c8qluemb', user='rfyglxtwtqlzun',
                         host='ec2-174-129-231-116.compute-1.amazonaws.com',
@@ -43,38 +42,6 @@ def parser(url, count):
         order_list = b.findAll('div', {'class': 'bd-item'})
 
         for order in order_list:
-            # name
-            item = order.find('div', {'class': 'title'})
-            order_name = item.find('a').text
-            print('Name: ' + order_name)
-
-            # link
-            order_link = item.find('a').get('href')
-            print('Link: ' + order_link)
-
-            # price
-            order_price = order.find('span', {'class': 'price-byr'}).text
-            order_all = re.match(r'\d+\s+\d+\s+руб,', order_price)
-            if not order_all:
-                order_all = re.search(r'\d+\s+руб,', order_price)
-            if order_all is not None:
-                order_all = re.sub(r'\s+', '', re.sub(r'\s+руб,', '', order_all.group(0)))
-            else:
-                order_all = 'None'
-            order_mln = re.match(r'\S+\s+млн\sруб,', order_price)
-            if order_mln is not None:
-                order_all = str(float(re.sub(r',', '.', re.sub(r'\s+млн\sруб,', '', order_mln.group(0)))) * 1000000)
-            print('Цена: ' + order_all)
-
-            # price by m2
-            order_by_m2 = re.search(r'\d+\s+\d+\s+руб/кв.м', order_price)
-            if not order_by_m2:
-                order_by_m2 = re.search(r'\d+\s+руб/кв.м', order_price)
-            if order_by_m2 is not None:
-                order_by_m2 = re.sub(r'\s+', '', re.sub(r'\s+руб/кв.м', '', order_by_m2.group(0)))
-            else:
-                order_by_m2 = "None"
-            print('Price by m2: ' + order_by_m2)
 
             # who
             order_who = order.find('p', {'class': 'f12'})
@@ -95,7 +62,6 @@ def parser(url, count):
                 else:
                     order_number_name = 'None'
             else:
-                order_number = 'None'
                 order_number_name = 'None'
 
 
@@ -105,36 +71,6 @@ def parser(url, count):
 
             print('Numbers: ' + order_numbers)
             print('Numbers_name: ' + order_number_name)
-
-            # code & update
-            order_update = order.find('p', {'class': 'fl f11 grey'}).text
-            order_update = re.sub(r'Обновлено: ', '', order_update)
-            print(order_update)
-            order_update = datetime.datetime.strftime(datetime.datetime.strptime(order_update, '%d.%m.%Y'), '%Y-%m-%d')
-            print(order_update)
-            order_code = order.find('p', {'class': 'fr f11 grey'}).text
-            order_code = re.sub(r'Код: ', '', order_code)
-            print(order_code)
-
-            # small where
-            order_about = order.find('div', {'class': 'bd-item-right-center'})
-            small_where = order_about.find('p').text
-            print(small_where)
-
-            # small_about = order_about.find_all("p")[-1].get_text()
-            # print(small_about)
-
-            print("")
-
-            # current time
-            currentdatetime = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
-
-            # params = (order_name, order_link, small_where, str(order_who), order_all, order_by_m2, order_numbers,
-            #          order_number_name, currentdatetime, order_update, order_code)
-
-            # cursor.execute("INSERT INTO realtby(order_name, order_link, small_where, order_who, order_price, \
-            # order_by_m2, order_numbers, order_number_name, currentdatetime, order_update, order_code) VALUES(%s, %s, \
-            # %s, %s, %s, %s, %s, %s, %s, %s, %s);", (params))
 
             params = (order_numbers, str(order_who), order_number_name)
 
