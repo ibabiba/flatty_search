@@ -85,16 +85,30 @@ def parser(url, count):
                         print("Найден новый номер агенства:" + number + " : " + order_who)
                         cursor.execute("INSERT INTO public.\"Agents\"(order_number, order_who, order_number_name) "
                                        "VALUES(%s, %s, %s) EXCEPT SELECT * from public.\"Agents\";", (params))
-                else:
-                    cursor.execute("INSERT INTO public.\"Agents\"(order_number, order_who, order_number_name) "
-                                   "VALUES(%s, %s, %s) EXCEPT SELECT * from public.\"Agents\";", (params))
-
                 conn.commit()
 
 
 parser(url, count)
 
-# def vacuum():
+
+def vacuum():
+    cursor.execute("SELECT * FROM public.\"Agents\"")
+    rows = cursor.fetchall()
+    for row in rows:
+        order_who = row[1]
+        if order_who != "None":
+            cursor.execute("SELECT * FROM public.\"Agents\" WHERE order_who LIKE %s;", (order_who,))
+            findedrows = cursor.fetchall()
+            addnumber = []
+            for findednumbers in findedrows:
+                addnumber.append(findednumbers[0])
+            number = ', '.join(addnumber)
+            params = (number, order_who, "Агенство")
+            cursor.execute("DELETE FROM public.\"Agents\" WHERE order_who = %s;", (order_who,))
+            cursor.execute("INSERT INTO public.\"Agents\"(order_number, order_who, order_number_name) "
+                           "VALUES(%s, %s, %s) EXCEPT SELECT * from public.\"Agents\";", (params))
+            conn.commit()
+    print("Vacuum complete")
 
 
-# vacuum()
+vacuum()
