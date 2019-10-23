@@ -27,6 +27,7 @@ def page_count(url, count):
     print(count)
     return count
 
+
 count = page_count(url, count)
 
 
@@ -49,7 +50,6 @@ def parser(url, count):
                 order_who = order_who.text
             else:
                 order_who = "None"
-            print("Who: " + order_who)
 
             # number
             order_number = order.find('p', {'class': 'mb0'}).get_text()
@@ -64,20 +64,37 @@ def parser(url, count):
             else:
                 order_number_name = 'None'
 
-
             # format nubers
             if order_numbers is not None:
                 order_numbers = re.sub(r'\s', '', re.sub(r'-', '', order_numbers))
 
-            print('Numbers: ' + order_numbers)
-            print('Numbers_name: ' + order_number_name)
+            order_numbers = order_numbers.split(',')
+            for number in order_numbers:
+                number = '%' + number + '%'
+                cursor.execute("SELECT order_number, order_who, order_number_name FROM public.\"Agents\" "
+                               "WHERE order_number LIKE %s;", (number,))
+                rows = cursor.fetchall()
+                number = re.sub(r'%', '', number)
+                params = (number, str(order_who), order_number_name)
+                if not rows:
+                    if order_who == "None":
+                        print("Найден новый номер Агента:" + number + " : " + order_number_name)
+                        cursor.execute("INSERT INTO public.\"Agents\"(order_number, order_who, order_number_name) "
+                                       "VALUES(%s, %s, %s) EXCEPT SELECT * from public.\"Agents\";", (params))
+                    else:
+                        print("Найден новый номер агенства:" + number + " : " + order_who)
+                        cursor.execute("INSERT INTO public.\"Agents\"(order_number, order_who, order_number_name) "
+                                       "VALUES(%s, %s, %s) EXCEPT SELECT * from public.\"Agents\";", (params))
+                else:
+                    cursor.execute("INSERT INTO public.\"Agents\"(order_number, order_who, order_number_name) "
+                                   "VALUES(%s, %s, %s) EXCEPT SELECT * from public.\"Agents\";", (params))
 
-            params = (order_numbers, str(order_who), order_number_name)
-
-            cursor.execute("INSERT INTO public.\"Agents\"(order_number, order_who, order_number_name) VALUES(%s, %s, "
-                           "%s) EXCEPT SELECT * from public.\"Agents\";", (params))
-            conn.commit()
-
+                conn.commit()
 
 
 parser(url, count)
+
+# def vacuum():
+
+
+# vacuum()
