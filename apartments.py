@@ -16,6 +16,7 @@ count = 0
 pagetempcount = 0
 url = 'https://realt.by/sale/flats/zhodino/?page='
 
+
 def page_count(url, count):
     url = url + str(count)
     s = requests.get(url)
@@ -28,6 +29,7 @@ def page_count(url, count):
 
 
 count = page_count(url, count)
+
 
 def parser(url, count):
     for x in range(0, int(count)):
@@ -93,11 +95,11 @@ def parser(url, count):
                 # number
                 order_number = order.find('p', {'class': 'mb0'}).get_text()
                 if order_number is not None:
-                    order_numbers = re.findall(r'\+\d+\s\d+\s\d+\-\d+\-\d+', order_number)
+                    order_numbers = re.findall(r'\+\d+\s\d+\s\d+-\d+-\d+', order_number)
                     order_numbers = ', '.join([str(x) for x in order_numbers])
                     order_number_name = re.search(r'\D+$', order_number)
                     if order_number_name is not None:
-                        order_number_name = re.sub(r'\,\s+', '', order_number_name.group(0))
+                        order_number_name = re.sub(r',\s+', '', order_number_name.group(0))
                     else:
                         order_number_name = 'None'
                 else:
@@ -114,7 +116,6 @@ def parser(url, count):
                 # update
                 order_update = order.find('p', {'class': 'fl f11 grey'}).text
                 order_update = re.sub(r'Обновлено: ', '', order_update)
-                print(order_update)
                 order_update = datetime.datetime.strftime(datetime.datetime.strptime(order_update, '%d.%m.%Y'),
                                                           '%Y-%m-%d')
                 print(order_update)
@@ -122,7 +123,6 @@ def parser(url, count):
                 # small where
                 order_about = order.find('div', {'class': 'bd-item-right-center'})
                 small_where = order_about.find('p').text
-
                 region = small_where.split(', ')[0]
                 print(region)
                 sity = small_where.split(', ')[1]
@@ -136,37 +136,21 @@ def parser(url, count):
                 flour = parse_about(small_about)
                 print(flour)
 
-
                 print("")
 
                 # current time
                 currentdatetime = datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d %H:%M:%S')
-
-                # params = (order_name, order_link, small_where, str(order_who), order_all, order_by_m2, order_numbers,
-                #          order_number_name, currentdatetime, order_update, order_code)
+                print(currentdatetime)
 
                 params = (sitename, order_name, order_link, order_all, order_by_m2, order_code, small_about, flour,
-                          region, sity)
+                          region, sity, order_update, currentdatetime)
                 cursor.execute(
                     "INSERT INTO public.\"apartaments\"(sitename, order_name, order_link, order_all, order_by_m2, "
-                    "order_code, small_about, flour, region, sity) "
-                    "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);", (params))
-
-            # cursor.execute("INSERT INTO realtby(order_name, order_link, small_where, order_who, order_price, \
-            # order_by_m2, order_numbers, order_number_name, currentdatetime, order_update, order_code) VALUES(%s, %s, \
-            # %s, %s, %s, %s, %s, %s, %s, %s, %s);", (params))
-
-            # params = (order_numbers, str(order_who), order_number_name)
-
-            # if order_who:
-            #    cursor.execute("INSERT INTO public.\"Agents\"(order_number, order_who, order_number_name) VALUES(%s, "
-            #                  "%s, %s) EXCEPT SELECT order_number, order_who from public.\"Agents\";", (params))
-            # else:
-            #   cursor.execute("INSERT INTO public.\"Agents\"(order_number, order_who, order_number_name) VALUES(%s, "
-            #                   "%s, %s) EXCEPT SELECT * from public.\"Agents\";", (params))
-            # conn.commit()
+                    "order_code, small_about, flour, region, sity, order_update, currentdatetime) "
+                    "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);", params)
 
         conn.commit()
+
 
 def parse_about(small_about):
     # flour
@@ -176,5 +160,6 @@ def parse_about(small_about):
     else:
         flour = "None"
     return flour
+
 
 parser(url, count)
