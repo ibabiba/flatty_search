@@ -1,10 +1,10 @@
 # -*- encoding: utf-8 -*-
 
+import re
+
+import bs4
 import psycopg2
 import requests
-import re
-import bs4
-import lxml
 
 conn = psycopg2.connect(dbname='d9gqs0c8qluemb', user='rfyglxtwtqlzun',
                         host='ec2-174-129-231-116.compute-1.amazonaws.com',
