@@ -10,31 +10,43 @@ import requests
 conn = psycopg2.connect(dbname='d9gqs0c8qluemb', user='rfyglxtwtqlzun',
                         host='ec2-174-129-231-116.compute-1.amazonaws.com',
                         password='38ae72b269ce6d2ed66524d4ece1fb3ba412f380c22128f27a7f3ee780465524')
-
 cursor = conn.cursor()
+
+urls = {'realt.by': 'https://realt.by/sale/flats/zhodino/?page=',
+        'domovita.by': 'https://domovita.by/zhodino/flats/sale?page='}
+
 count = 0
 pagetempcount = 0
-url = 'https://realt.by/sale/flats/zhodino/?page='
 
 
-def page_count(url, count):
-    url = url + str(count)
-    s = requests.get(url)
-    b = bs4.BeautifulSoup(s.text, "html.parser")
+def page_count(urls):
+    counts = {}
+    for name, url in urls.items():
+        page_url = url + "0"
+        s = requests.get(page_url)
+        b = bs4.BeautifulSoup(s.text, "html.parser")
+        if name == 'realt.by':
+            count = b.find('div', {'class': 'uni-paging'}).findAll("a")[-1].text
+        elif name == 'domovita.by':
+            item = b.find('div', {'class': 'col-sm-12 fs-12 lh-30 findcount'}).text
+            count = int(re.search(r'\d+', item).group(0))//20 + 1
+        counts[name] = count
+    print(counts)
+    # {'realt.by': '8', 'domovita.by': 5}
+    return counts
 
-    item = b.find('div', {'class': 'uni-paging'})
-    count = item.findAll("a")[-1].text
-    print(count)
-    return count
 
-
-count = page_count(url, count)
+counts = page_count(urls)
 
 
 def parser(url, count):
-    for x in range(0, int(count)):
-        print(x)
-        print(url + str(x))
+    if name == 'realt.by':
+        page_range = range(0, count)
+    elif name == 'domovita.by':
+        page_range = range(1, count + 1)
+
+    for x in page_range:
+        print(x, url + str(x))
 
         s = requests.get(url + str(x))
         b = bs4.BeautifulSoup(s.text, "lxml")
@@ -149,7 +161,7 @@ def parser(url, count):
                     "order_code, small_about, flour, region, sity, order_update, currentdatetime) "
                     "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);", params)
 
-        conn.commit()
+        # conn.commit()
 
 
 def parse_about(small_about):
@@ -162,4 +174,7 @@ def parse_about(small_about):
     return flour
 
 
-parser(url, count)
+for name, url in urls.items():
+    count = int(counts[name])
+    #if name == 'realt.by':
+    parser(url, count)
