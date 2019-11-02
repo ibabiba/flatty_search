@@ -29,7 +29,7 @@ def page_count(urls):
             count = b.find('div', {'class': 'uni-paging'}).findAll("a")[-1].text
         elif name == 'domovita.by':
             item = b.find('div', {'class': 'col-sm-12 fs-12 lh-30 findcount'}).text
-            count = int(re.search(r'\d+', item).group(0))//20 + 1
+            count = int(re.search(r'\d+', item).group(0)) // 20 + 1
         counts[name] = count
     print(counts)
     # {'realt.by': '8', 'domovita.by': 5}
@@ -176,5 +176,5 @@ def parse_about(small_about):
 
 for name, url in urls.items():
     count = int(counts[name])
-    #if name == 'realt.by':
+    # if name == 'realt.by':
     parser(url, count)
