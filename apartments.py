@@ -161,7 +161,7 @@ def parser(url, count):
                     "order_code, small_about, flour, region, sity, order_update, currentdatetime) "
                     "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s);", params)
 
-        # conn.commit()
+        conn.commit()
 
 
 def parse_about(small_about):
