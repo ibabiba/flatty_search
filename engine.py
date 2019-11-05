@@ -33,8 +33,7 @@ count = page_count(url, count)
 
 def parser(url, count):
     for x in range(0, int(count)):
-        print(x)
-        print(url + str(x))
+        print(x, url + str(x))
 
         # results = []
 
